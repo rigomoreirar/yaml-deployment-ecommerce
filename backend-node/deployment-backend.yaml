@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-backend-deployment
+  namespace: ecommerce
+  labels:
+    app: node-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-backend
+  template:
+    metadata:
+      labels:
+        app: node-backend
+    spec:
+      containers:
+      - name: node-backend
+        image: rigomoreirar/backend-ecommerce-template:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret-backend
+              key: mongo-root-username
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret-backend
+              key: mongo-root-password
+        - name: CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret-backend
+              key: connection-string
+        - name: JWT_CODE
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret-backend
+              key: jwt-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-backend-service
+spec:
+  selector:
+    app: node-backend
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+

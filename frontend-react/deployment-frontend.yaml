@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-ecommerce-deployment
+  namespace: ecommerce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-ecommerce
+  template:
+    metadata:
+      labels:
+        app: frontend-ecommerce
+    spec:
+      containers:
+      - name: frontend-ecommerce
+        image: rigomoreirar/frontend-ecommerce-template:latest
+        ports:
+        - containerPort: 3000 
+        env:
+        - name: BACKEND_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret-connection
+              key: backend-conenction-string
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-ecommerce-service
+spec:
+  type: ClusterIP  
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: frontend-ecommerce
+
